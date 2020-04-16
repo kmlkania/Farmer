@@ -2,8 +2,8 @@ from PyQt5 import QtWidgets
 
 
 class PlayerNamesWindow:
-    def __init__(self, handler):
-        self.handler = handler
+    def __init__(self):
+        self.callback = None
         self.window = QtWidgets.QWidget()
         self.grid_layout = QtWidgets.QGridLayout()
         self.radio_buttons = []
@@ -64,9 +64,13 @@ class PlayerNamesWindow:
             players.append(self.players_names[i].text())
         if all(players) and len(set(players)) == self.number_of_players:
             self.window.close()
-            self.handler.set_players(players)
+            if self.callback:
+                self.callback(players)
         else:
             QtWidgets.QMessageBox.about(self.window, 'Farmer warn', 'enter different names first')
+
+    def set_exit_callback(self, callback):
+        self.callback = callback
 
     def show_window(self):
         self.window.show()

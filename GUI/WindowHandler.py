@@ -8,8 +8,9 @@ class WindowHandler:
         self.players = []
 
     def __call__(self, *args, **kwargs):
-        self.current_window = PlayerNamesWindow(self)
+        self.current_window = PlayerNamesWindow()
         self.current_window.setup_main_window()
+        self.current_window.set_exit_callback(self.set_players)
         self.current_window.show_window()
 
     def set_players(self, players):

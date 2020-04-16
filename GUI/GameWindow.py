@@ -25,7 +25,7 @@ class GameWindow:
         self.grid_layout.addWidget(common_widget, 0, 0, 1, 1)
         lbl = QtWidgets.QLabel()
         lbl.setText('common herd:')
-        inside_grid.addWidget(lbl, 0, 0, 1, 1)
+        inside_grid.addWidget(lbl, 0, 0, 1, 2)
         animals = self.game.herd.common.herd
         self.common_view_items = {animal: QtWidgets.QLabel(common_widget) for animal in animals.keys()}
         for i, item in enumerate(self.common_view_items.items()):
@@ -42,7 +42,7 @@ class GameWindow:
             player_widget.setLayout(inside_grid)
             lbl = QtWidgets.QLabel()
             lbl.setText(name)
-            inside_grid.addWidget(lbl, 0, 0, 1, 1)
+            inside_grid.addWidget(lbl, 0, 0, 1, 2)
             animals = self.game.herd.players_herd[name].herd
             self.players_view.update({name: {animal: QtWidgets.QLabel() for animal in animals.keys()}})
             for i, item in enumerate(self.players_view[name].items()):
