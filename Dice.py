@@ -16,9 +16,9 @@ class DiceHandler:
         self._red_dice = Dice({'rabbit': 6, 'sheep': 3, 'pig': 1, 'horse': 1, 'fox': 1})
 
     @property
-    def get_green_dice(self):
+    def green_dice(self):
         return self._green_dice
 
     @property
-    def get_red_dice(self):
+    def red_dice(self):
         return self._red_dice
