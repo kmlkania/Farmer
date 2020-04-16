@@ -22,4 +22,3 @@ class WindowHandler:
         self.current_window = GameWindow(self.players)
         self.current_window.setup_window()
         self.current_window.show_window()
-

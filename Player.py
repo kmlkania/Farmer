@@ -19,4 +19,3 @@ class PlayerHandler:
     def has_winner(self):
         self._is_winner = any(player.has_won for player in self.players.values())
         return self._is_winner
-
