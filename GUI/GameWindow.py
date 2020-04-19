@@ -11,12 +11,16 @@ class GameWindow:
         self.window.setLayout(self.grid_layout)
         self.common_view_items = {}
         self.players_view = {}
+        self.info_viewer = None
 
     def setup_window(self):
         self.window.setWindowTitle('Farmer Game')
         self.configure_common_widget()
         self.configure_player_widget()
+        self.configure_info_widget()
         self.update_view()
+        self.set_game_callbacks()
+        self.update_info("{} starts the game".format(self.players_names[0]))
 
     def configure_common_widget(self):
         common_widget = QtWidgets.QWidget()
@@ -38,18 +42,34 @@ class GameWindow:
             animals = self.game.herd.players_herd[name].herd
             self.players_view.update({name: {animal: QtWidgets.QLabel() for animal in animals.keys()}})
             self.fill_herd_view(herd=self.players_view[name], widget=inside_grid)
-            self.add_action_buttons(widget=inside_grid)
+            self.add_action_buttons(widget=inside_grid, name=name)
+            if i > 0:
+                self.players_view[name]['roll'].setEnabled(False)
+                self.players_view[name]['change'].setEnabled(False)
 
-    @staticmethod
-    def add_action_buttons(widget):
+    def configure_info_widget(self):
+        info_widget = QtWidgets.QWidget()
+        self.grid_layout.addWidget(info_widget, 2, 0, 1, len(self.players_names))
+        self.info_viewer = QtWidgets.QTextBrowser()
+        inside_grid = QtWidgets.QGridLayout()
+        info_widget.setLayout(inside_grid)
+        inside_grid.addWidget(self.info_viewer, 0, 0, 1, 1)
+        self.info_viewer.append('game start')
+
+    def add_action_buttons(self, widget, name):
         roll_btn = QtWidgets.QPushButton()
         roll_btn.setText('Roll')
-        roll_btn.clicked.connect(lambda x: None)
         widget.addWidget(roll_btn, 8, 0, 1, 1)
-        roll_btn = QtWidgets.QPushButton()
-        roll_btn.setText('Change')
-        roll_btn.clicked.connect(lambda x: None)
-        widget.addWidget(roll_btn, 8, 1, 1, 1)
+        change_btn = QtWidgets.QPushButton()
+        change_btn.setText('Change')
+        widget.addWidget(change_btn, 8, 1, 1, 1)
+        roll_btn.clicked.connect(self.make_user_roll(name))
+        self.players_view[name].update({'roll': roll_btn, 'change': change_btn})
+
+    def make_user_roll(self, name):
+        def user_roll():
+            self.game.make_roll(name)
+        return user_roll
 
     @staticmethod
     def fill_herd_owner(name, widget):
@@ -77,5 +97,21 @@ class GameWindow:
             for animal, value in animals.items():
                 view[animal].setText(str(value))
 
-    def parse_printout(self, to_print):
-        return '\n'.join(['{}: {}'.format(k, v) for k, v in to_print.items()])
+    def set_game_callbacks(self):
+        self.game.set_info_callback(self.update_info)
+        self.game.set_end_turn_callback(self.change_active_player)
+
+    def update_info(self, msg):
+        self.info_viewer.append(msg)
+
+    def change_active_player(self, current_player_name):
+        index_of_next_player = (self.players_names.index(current_player_name) + 1) % len(self.players_names)
+        for i, name in enumerate(self.players_names):
+            if i == index_of_next_player:
+                self.players_view[name]['roll'].setEnabled(True)
+                self.players_view[name]['change'].setEnabled(True)
+                self.update_info("{}'s turn".format(name))
+            else:
+                self.players_view[name]['roll'].setEnabled(False)
+                self.players_view[name]['change'].setEnabled(False)
+

@@ -9,13 +9,28 @@ class Game:
         self.dices = DiceHandler()
         self.players_names = players_names
         self.players = PlayerHandler(self.players_names)
+        self.end_turn_callback = None
+        self.info_callback = None
 
     def start(self):
         iteration = 0
         while not self.players.has_winner:
             player_id = iteration % len(self.players_names)
-            print('player {} yours herd is'.format(self.players_names[player_id]))
-            print(self.players[player_id].show_herd)
+            if self.next_turn_callback:
+                self.next_turn_callback(self.players_names[player_id])
             iteration += 1
+
+    def set_end_turn_callback(self, callback):
+        self.end_turn_callback = callback
+
+    def set_info_callback(self, callback):
+        self.info_callback = callback
+
+    def make_roll(self, name):
+        results = [self.dices.green_dice.roll_dice(), self.dices.red_dice.roll_dice()]
+        if self.info_callback:
+            self.info_callback('{} rolled out: {}'.format(name, ' and '.join(results)))
+        if self.end_turn_callback:
+            self.end_turn_callback(name)
 
 
