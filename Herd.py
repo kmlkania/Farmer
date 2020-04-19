@@ -18,13 +18,35 @@ class Herd:
 class PlayerHerd(Herd):
     def __init__(self):
         super(PlayerHerd, self).__init__()
+        self.retrieve_animal_from_common_herd = None
+        self.add_animal_to_common_herd = None
 
-    def add_animal(self, animal, number):
-        pass
+    def add_animal(self, animal, number=1):
+        if animal == 'wolf':
+            if self.herd['big_dog']:
+                self.herd['big_dog'] -= 1
+            else:
+                self.add_animal_to_common_herd({'sheep': self.herd['sheep'], 'pig': self.herd['pig'],
+                                                'cow': self.herd['cow']})
+                self.herd['sheep'] = 0
+                self.herd['pig'] = 0
+                self.herd['cow'] = 0
+        elif animal == 'fox':
+            if self.herd['small_dog']:
+                self.herd['small_dog'] -= 1
+            elif self.herd['rabbit'] > 1:
+                self.add_animal_to_common_herd({'rabbit': self.herd['rabbit'] - 1})
+                self.herd['rabbit'] = 1
+        else:
+            population_to_add = int((self.herd[animal] + number) / 2)
+            available_animals = self.retrieve_animal_from_common_herd(animal, population_to_add)
+            self.herd[animal] += available_animals
 
-    @property
-    def rabbit(self):
-        return self._animals['rabbit']
+    def set_common_herd_retrieve_animal_callback(self, callback):
+        self.retrieve_animal_from_common_herd = callback
+
+    def set_add_animal_to_common_herd_callback(self, callback):
+        self.add_animal_to_common_herd = callback
 
 
 class CommonHerd(Herd):
@@ -45,16 +67,24 @@ class CommonHerd(Herd):
 
     def retrieve_animal(self, animal, number):
         if self._animals[animal] < number:
-            self._animals[animal] -= number
-            available_animals = number
-        else:
             available_animals = self._animals[animal]
             self._animals[animal] = 0
+        else:
+            self._animals[animal] -= number
+            available_animals = number
         return available_animals
+
+    def add_animals(self, animals):
+        for animal, number in animals.items():
+            self._animals[animal] += number
 
 
 class HerdHandler:
     def __init__(self, names):
         self.common = CommonHerd()
         self.players_herd = {name: PlayerHerd() for name in names}
+        for player in self.players_herd.values():
+            player.set_common_herd_retrieve_animal_callback(self.common.retrieve_animal)
+            player.set_add_animal_to_common_herd_callback(self.common.add_animals)
+
 

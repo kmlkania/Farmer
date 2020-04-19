@@ -114,4 +114,5 @@ class GameWindow:
             else:
                 self.players_view[name]['roll'].setEnabled(False)
                 self.players_view[name]['change'].setEnabled(False)
+        self.update_view()
 
