@@ -24,6 +24,7 @@ class PlayerHerd(Herd):
     def add_animal(self, animal, number=1):
         if animal == 'wolf':
             if self.herd['big_dog']:
+                self.add_animal_to_common_herd({'big_dog': 1})
                 self.herd['big_dog'] -= 1
             else:
                 self.add_animal_to_common_herd({'sheep': self.herd['sheep'], 'pig': self.herd['pig'],
@@ -33,6 +34,7 @@ class PlayerHerd(Herd):
                 self.herd['cow'] = 0
         elif animal == 'fox':
             if self.herd['small_dog']:
+                self.add_animal_to_common_herd({'small_dog': 1})
                 self.herd['small_dog'] -= 1
             elif self.herd['rabbit'] > 1:
                 self.add_animal_to_common_herd({'rabbit': self.herd['rabbit'] - 1})

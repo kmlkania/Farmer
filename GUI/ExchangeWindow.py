@@ -36,7 +36,7 @@ class ExchangeWindow:
             self.spin_boxes['sell'].update({animal[0]: sell_spin_box})
             self.spin_boxes['buy'].update({animal[0]: buy_spin_box})
             self.grid_layout.addWidget(sell_spin_box, offset + i, 2, 1, 1)
-            self.grid_layout.addWidget(buy_spin_box, offset + i, 4, 1, 1)
+            self.grid_layout.addWidget(buy_spin_box, offset + i, 3, 1, 1)
         offset += len(animals)
         ok_btn = QtWidgets.QPushButton()
         ok_btn.setText('OK')

@@ -62,7 +62,7 @@ class GameWindow:
         roll_btn.setText('Roll')
         widget.addWidget(roll_btn, 8, 0, 1, 1)
         exchange_btn = QtWidgets.QPushButton()
-        exchange_btn.setText('Change')
+        exchange_btn.setText('Exchange')
         widget.addWidget(exchange_btn, 8, 1, 1, 1)
         roll_btn.clicked.connect(self.make_user_roll(name))
         exchange_btn.clicked.connect(self.make_user_exchange(name))
