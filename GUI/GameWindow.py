@@ -1,14 +1,15 @@
 from PyQt5 import QtWidgets
 from Game import Game
+from GUI.ExchangeWindow import ExchangeWindow
 
 
 class GameWindow:
     def __init__(self, players):
         self.window = QtWidgets.QWidget()
         self.grid_layout = QtWidgets.QGridLayout()
+        self.window.setLayout(self.grid_layout)
         self.players_names = players
         self.game = Game(players)
-        self.window.setLayout(self.grid_layout)
         self.common_view_items = {}
         self.players_view = {}
         self.info_viewer = None
@@ -45,7 +46,7 @@ class GameWindow:
             self.add_action_buttons(widget=inside_grid, name=name)
             if i > 0:
                 self.players_view[name]['roll'].setEnabled(False)
-                self.players_view[name]['change'].setEnabled(False)
+                self.players_view[name]['exchange'].setEnabled(False)
 
     def configure_info_widget(self):
         info_widget = QtWidgets.QWidget()
@@ -60,16 +61,22 @@ class GameWindow:
         roll_btn = QtWidgets.QPushButton()
         roll_btn.setText('Roll')
         widget.addWidget(roll_btn, 8, 0, 1, 1)
-        change_btn = QtWidgets.QPushButton()
-        change_btn.setText('Change')
-        widget.addWidget(change_btn, 8, 1, 1, 1)
+        exchange_btn = QtWidgets.QPushButton()
+        exchange_btn.setText('Change')
+        widget.addWidget(exchange_btn, 8, 1, 1, 1)
         roll_btn.clicked.connect(self.make_user_roll(name))
-        self.players_view[name].update({'roll': roll_btn, 'change': change_btn})
+        exchange_btn.clicked.connect(self.make_user_exchange(name))
+        self.players_view[name].update({'roll': roll_btn, 'exchange': exchange_btn})
 
     def make_user_roll(self, name):
         def user_roll():
             self.game.make_roll(name)
         return user_roll
+
+    def make_user_exchange(self, name):
+        def user_exchange():
+            self.make_exchange(name)
+        return user_exchange
 
     @staticmethod
     def fill_herd_owner(name, widget):
@@ -109,10 +116,21 @@ class GameWindow:
         for i, name in enumerate(self.players_names):
             if i == index_of_next_player:
                 self.players_view[name]['roll'].setEnabled(True)
-                self.players_view[name]['change'].setEnabled(True)
+                self.players_view[name]['exchange'].setEnabled(True)
                 self.update_info("{}'s turn".format(name))
             else:
                 self.players_view[name]['roll'].setEnabled(False)
-                self.players_view[name]['change'].setEnabled(False)
+                self.players_view[name]['exchange'].setEnabled(False)
+        self.update_view()
+
+    def make_exchange(self, name):
+        exchange_window = ExchangeWindow()
+        exchange_window.set_exchange_callback(self.animals_exchanged)
+        exchange_window.setup_window(name, self.game.herd.players_herd[name].herd)
+        result = exchange_window.show_window()
+
+    def animals_exchanged(self, name, animals_to_sell, animals_to_buy):
+        self.game.sell_animals(name, animals_to_sell)
+        self.game.buy_animals(name, animals_to_buy)
         self.update_view()
 

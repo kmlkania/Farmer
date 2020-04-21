@@ -48,6 +48,15 @@ class PlayerHerd(Herd):
     def set_add_animal_to_common_herd_callback(self, callback):
         self.add_animal_to_common_herd = callback
 
+    def sell_animals(self, animals):
+        self.add_animal_to_common_herd(animals)
+        for animal, number in animals.items():
+            self.herd[animal] -= number
+
+    def buy_animals(self, animals):
+        for animal, number in animals.items():
+            self.herd[animal] += self.retrieve_animal_from_common_herd(animal, number)
+
 
 class CommonHerd(Herd):
     def __init__(self):

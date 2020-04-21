@@ -26,4 +26,9 @@ class Game:
         if self.end_turn_callback:
             self.end_turn_callback(name)
 
+    def sell_animals(self, player, animals):
+        self.herd.players_herd[player].sell_animals(animals)
+
+    def buy_animals(self, player, animals):
+        self.herd.players_herd[player].buy_animals(animals)
 
