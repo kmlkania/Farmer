@@ -1,5 +1,5 @@
-from Herd import HerdHandler
-from Dice import DiceHandler
+from Game.Herd import HerdHandler
+from Game.Dice import DiceHandler
 
 
 class Game:

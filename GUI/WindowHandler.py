@@ -15,7 +15,6 @@ class WindowHandler:
 
     def set_players(self, players):
         self.players = players
-        print('players from WindowHandler: {}'.format(self.players))
         self.start_game()
 
     def start_game(self):

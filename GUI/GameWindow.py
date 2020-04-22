@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets
-from Game import Game
+from Game.Game import Game
 from GUI.ExchangeWindow import ExchangeWindow
 
 

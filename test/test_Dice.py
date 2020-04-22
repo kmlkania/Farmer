@@ -1,5 +1,4 @@
-from Dice import Dice
-import mock
+from Game.Dice import Dice
 
 
 def test_Dice_can_be_rolled():
