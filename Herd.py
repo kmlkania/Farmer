@@ -98,4 +98,16 @@ class HerdHandler:
             player.set_common_herd_retrieve_animal_callback(self.common.retrieve_animal)
             player.set_add_animal_to_common_herd_callback(self.common.add_animals)
 
+    def get_common_herd(self):
+        return self.common.herd
+
+    def get_player_herd(self, name):
+        return self.players_herd[name].herd
+
+    def sell_animals(self, player, animals):
+        self.players_herd[player].sell_animals(animals)
+
+    def buy_animals(self, player, animals):
+        self.players_herd[player].buy_animals(animals)
+
 

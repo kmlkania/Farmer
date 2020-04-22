@@ -7,7 +7,6 @@ class Game:
     def __init__(self, players_names):
         self.herd = HerdHandler(players_names)
         self.dices = DiceHandler()
-        # self.players_names = players_names
         self.players = PlayerHandler({name: self.herd.players_herd[name] for name in players_names})
         self.end_turn_callback = None
         self.info_callback = None
@@ -27,8 +26,14 @@ class Game:
             self.end_turn_callback(name)
 
     def sell_animals(self, player, animals):
-        self.herd.players_herd[player].sell_animals(animals)
+        self.herd.sell_animals(player, animals)
 
     def buy_animals(self, player, animals):
-        self.herd.players_herd[player].buy_animals(animals)
+        self.herd.buy_animals(player, animals)
+
+    def get_common_herd(self):
+        return self.herd.get_common_herd()
+
+    def get_player_herd(self, name):
+        return self.herd.get_player_herd(name)
 

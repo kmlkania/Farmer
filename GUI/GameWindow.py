@@ -29,7 +29,7 @@ class GameWindow:
         inside_grid = QtWidgets.QGridLayout()
         common_widget.setLayout(inside_grid)
         self.fill_herd_owner(name='common herd', widget=inside_grid)
-        animals = self.game.herd.common.herd
+        animals = self.game.get_common_herd()
         self.common_view_items = {animal: QtWidgets.QLabel(common_widget) for animal in animals.keys()}
         self.fill_herd_view(herd=self.common_view_items, widget=inside_grid)
 
@@ -40,7 +40,7 @@ class GameWindow:
             inside_grid = QtWidgets.QGridLayout()
             player_widget.setLayout(inside_grid)
             self.fill_herd_owner(name=name, widget=inside_grid)
-            animals = self.game.herd.players_herd[name].herd
+            animals = self.game.get_player_herd(name)
             self.players_view.update({name: {animal: QtWidgets.QLabel() for animal in animals.keys()}})
             self.fill_herd_view(herd=self.players_view[name], widget=inside_grid)
             self.add_action_buttons(widget=inside_grid, name=name)
@@ -96,11 +96,11 @@ class GameWindow:
         self.window.show()
 
     def update_view(self):
-        animals = self.game.herd.common.herd
+        animals = self.game.get_common_herd()
         for animal, value in animals.items():
             self.common_view_items[animal].setText(str(value))
         for name, view in self.players_view.items():
-            animals = self.game.herd.players_herd[name].herd
+            animals = self.game.get_player_herd(name)
             for animal, value in animals.items():
                 view[animal].setText(str(value))
 
@@ -126,7 +126,7 @@ class GameWindow:
     def make_exchange(self, name):
         exchange_window = ExchangeWindow()
         exchange_window.set_exchange_callback(self.animals_exchanged)
-        exchange_window.setup_window(name, self.game.herd.players_herd[name].herd)
+        exchange_window.setup_window(name, self.game.get_player_herd(name))
         result = exchange_window.show_window()
 
     def animals_exchanged(self, name, animals_to_sell, animals_to_buy):
