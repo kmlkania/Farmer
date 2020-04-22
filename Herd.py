@@ -110,4 +110,11 @@ class HerdHandler:
     def buy_animals(self, player, animals):
         self.players_herd[player].buy_animals(animals)
 
+    def reproduce_animals(self, player, roll_result):
+        if roll_result[0] == roll_result[1]:
+            self.players_herd[player].add_animal(roll_result[0], 2)
+        else:
+            self.players_herd[player].add_animal(roll_result[0])
+            self.players_herd[player].add_animal(roll_result[1])
+
 
