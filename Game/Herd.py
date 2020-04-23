@@ -44,7 +44,7 @@ class PlayerHerd(Herd):
             available_animals = self.retrieve_animal_from_common_herd(animal, population_to_add)
             self.herd[animal] += available_animals
 
-    def set_common_herd_retrieve_animal_callback(self, callback):
+    def set_retrieve_animal_from_common_herd_callback(self, callback):
         self.retrieve_animal_from_common_herd = callback
 
     def set_add_animal_to_common_herd_callback(self, callback):
@@ -95,7 +95,7 @@ class HerdHandler:
         self.common = CommonHerd()
         self.players_herd = {name: PlayerHerd() for name in names}
         for player in self.players_herd.values():
-            player.set_common_herd_retrieve_animal_callback(self.common.retrieve_animal)
+            player.set_retrieve_animal_from_common_herd_callback(self.common.retrieve_animal)
             player.set_add_animal_to_common_herd_callback(self.common.add_animals)
 
     def get_common_herd(self):
