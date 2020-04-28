@@ -90,3 +90,20 @@ def test_available_animals_can_be_added_to_player_herd():
         'small_dog': 0,
         'big_dog': 0
     }
+
+
+def test_wolf_eats_big_dog():
+    from Game.Herd import PlayerHerd
+    herd = PlayerHerd()
+    herd._animals.update({'rabbit': 2, 'sheep': 3, 'pig': 4, 'cow': 5, 'horse': 6, 'small_dog': 7, 'big_dog': 2})
+    herd.set_add_animal_to_common_herd_callback(lambda x: None)
+    herd.animal_came('wolf')
+    assert herd.herd == {
+        'rabbit': 2,
+        'sheep': 3,
+        'pig': 4,
+        'cow': 5,
+        'horse': 6,
+        'small_dog': 7,
+        'big_dog': 1
+    }
