@@ -21,34 +21,19 @@ class PlayerHerd(Herd):
         self.retrieve_animal_from_common_herd = None
         self.add_animal_to_common_herd = None
 
-    def add_animal(self, animal, number=1):
-        if animal == 'wolf':
-            if self.herd['big_dog']:
-                self.add_animal_to_common_herd({'big_dog': 1})
-                self.herd['big_dog'] -= 1
-            else:
-                self.add_animal_to_common_herd({'sheep': self.herd['sheep'], 'pig': self.herd['pig'],
-                                                'cow': self.herd['cow']})
-                self.herd['sheep'] = 0
-                self.herd['pig'] = 0
-                self.herd['cow'] = 0
-        elif animal == 'fox':
-            if self.herd['small_dog']:
-                self.add_animal_to_common_herd({'small_dog': 1})
-                self.herd['small_dog'] -= 1
-            elif self.herd['rabbit'] > 1:
-                self.add_animal_to_common_herd({'rabbit': self.herd['rabbit'] - 1})
-                self.herd['rabbit'] = 1
-        else:
-            population_to_add = int((self.herd[animal] + number) / 2)
-            available_animals = self.retrieve_animal_from_common_herd(animal, population_to_add)
-            self.herd[animal] += available_animals
-
     def set_retrieve_animal_from_common_herd_callback(self, callback):
         self.retrieve_animal_from_common_herd = callback
 
     def set_add_animal_to_common_herd_callback(self, callback):
         self.add_animal_to_common_herd = callback
+
+    def animal_came(self, animal, number=1):
+        if animal == 'wolf':
+            self._wolf_came()
+        elif animal == 'fox':
+            self._fox_came()
+        else:
+            self._animal_reproduction(animal, number)
 
     def sell_animals(self, animals):
         self.add_animal_to_common_herd(animals)
@@ -58,6 +43,30 @@ class PlayerHerd(Herd):
     def buy_animals(self, animals):
         for animal, number in animals.items():
             self.herd[animal] += self.retrieve_animal_from_common_herd(animal, number)
+
+    def _wolf_came(self):
+        if self.herd['big_dog']:
+            self.add_animal_to_common_herd({'big_dog': 1})
+            self.herd['big_dog'] -= 1
+        else:
+            self.add_animal_to_common_herd({'sheep': self.herd['sheep'], 'pig': self.herd['pig'],
+                                            'cow': self.herd['cow']})
+            self.herd['sheep'] = 0
+            self.herd['pig'] = 0
+            self.herd['cow'] = 0
+
+    def _fox_came(self):
+        if self.herd['small_dog']:
+            self.add_animal_to_common_herd({'small_dog': 1})
+            self.herd['small_dog'] -= 1
+        elif self.herd['rabbit'] > 1:
+            self.add_animal_to_common_herd({'rabbit': self.herd['rabbit'] - 1})
+            self.herd['rabbit'] = 1
+
+    def _animal_reproduction(self, animal, number):
+            population_to_add = int((self.herd[animal] + number) / 2)
+            available_animals = self.retrieve_animal_from_common_herd(animal, population_to_add)
+            self.herd[animal] += available_animals
 
 
 class CommonHerd(Herd):
@@ -112,9 +121,9 @@ class HerdHandler:
 
     def reproduce_animals(self, player, roll_result):
         if roll_result[0] == roll_result[1]:
-            self.players_herd[player].add_animal(roll_result[0], 2)
+            self.players_herd[player].animal_came(roll_result[0], 2)
         else:
-            self.players_herd[player].add_animal(roll_result[0])
-            self.players_herd[player].add_animal(roll_result[1])
+            self.players_herd[player].animal_came(roll_result[0])
+            self.players_herd[player].animal_came(roll_result[1])
 
 
