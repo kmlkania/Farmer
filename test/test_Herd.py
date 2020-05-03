@@ -1,3 +1,6 @@
+import pytest
+
+
 def test_herd_can_be_obtained():
     from Game.Herd import Herd
     herd = Herd()
@@ -92,11 +95,11 @@ def test_available_animals_can_be_added_to_player_herd():
     }
 
 
-def test_wolf_eats_big_dog():
+def test_wolf_eats_big_dog(common_herd_mock):
     from Game.Herd import PlayerHerd
     herd = PlayerHerd()
     herd._animals.update({'rabbit': 2, 'sheep': 3, 'pig': 4, 'cow': 5, 'horse': 6, 'small_dog': 7, 'big_dog': 2})
-    herd.set_add_animal_to_common_herd_callback(lambda x: None)
+    herd.set_add_animal_to_common_herd_callback(common_herd_mock.add)
     herd.animal_came('wolf')
     assert herd.herd == {
         'rabbit': 2,
@@ -107,3 +110,105 @@ def test_wolf_eats_big_dog():
         'small_dog': 7,
         'big_dog': 1
     }
+    assert common_herd_mock.herd == {'big_dog': 1}
+
+
+def test_wolf_eats_sheeps_pig_cows(common_herd_mock):
+    from Game.Herd import PlayerHerd
+    herd = PlayerHerd()
+    herd._animals.update({'rabbit': 2, 'sheep': 3, 'pig': 4, 'cow': 5, 'horse': 6, 'small_dog': 7, 'big_dog': 0})
+    herd.set_add_animal_to_common_herd_callback(common_herd_mock.add)
+    herd.animal_came('wolf')
+    assert herd.herd == {
+        'rabbit': 2,
+        'sheep': 0,
+        'pig': 0,
+        'cow': 0,
+        'horse': 6,
+        'small_dog': 7,
+        'big_dog': 0
+    }
+    assert common_herd_mock.herd == {'sheep': 3, 'pig': 4, 'cow': 5}
+
+
+def test_fox_eats_small_dog(common_herd_mock):
+    from Game.Herd import PlayerHerd
+    herd = PlayerHerd()
+    herd._animals.update({'rabbit': 12, 'sheep': 3, 'pig': 4, 'cow': 5, 'horse': 6, 'small_dog': 3, 'big_dog': 2})
+    herd.set_add_animal_to_common_herd_callback(common_herd_mock.add)
+    herd.animal_came('fox')
+    assert herd.herd == {
+        'rabbit': 12,
+        'sheep': 3,
+        'pig': 4,
+        'cow': 5,
+        'horse': 6,
+        'small_dog': 2,
+        'big_dog': 2
+    }
+    assert common_herd_mock.herd == {'small_dog': 1}
+
+
+def test_fox_eats_rabbits_except_one(common_herd_mock):
+    from Game.Herd import PlayerHerd
+    herd = PlayerHerd()
+    herd._animals.update({'rabbit': 12, 'sheep': 3, 'pig': 4, 'cow': 5, 'horse': 6, 'small_dog': 0, 'big_dog': 2})
+    herd.set_add_animal_to_common_herd_callback(common_herd_mock.add)
+    herd.animal_came('fox')
+    assert herd.herd == {
+        'rabbit': 1,
+        'sheep': 3,
+        'pig': 4,
+        'cow': 5,
+        'horse': 6,
+        'small_dog': 0,
+        'big_dog': 2
+    }
+    assert common_herd_mock.herd == {'rabbit': 11}
+
+
+def test_player_can_sell_animals(common_herd_mock):
+    from Game.Herd import PlayerHerd
+    herd = PlayerHerd()
+    herd._animals.update({'rabbit': 15, 'sheep': 3, 'pig': 4, 'cow': 1, 'horse': 2, 'small_dog': 2, 'big_dog': 2})
+    herd.set_add_animal_to_common_herd_callback(common_herd_mock.add)
+    herd.sell_animals({'rabbit': 6, 'sheep': 1, 'pig': 2})
+    assert herd.herd == {
+        'rabbit': 9,
+        'sheep': 2,
+        'pig': 2,
+        'cow': 1,
+        'horse': 2,
+        'small_dog': 2,
+        'big_dog': 2
+    }
+    assert common_herd_mock.herd == {'rabbit': 6, 'sheep': 1, 'pig': 2}
+
+
+def test_player_can_buy_only_available_animals():
+    from Game.Herd import PlayerHerd
+    herd = PlayerHerd()
+    herd._animals.update({'rabbit': 15, 'sheep': 3, 'pig': 4, 'cow': 1, 'horse': 2, 'small_dog': 2, 'big_dog': 2})
+    herd.set_retrieve_animal_from_common_herd_callback(lambda x, y: y - 1)
+    herd.buy_animals({'cow': 2, 'pig': 5})
+    assert herd.herd == {
+        'rabbit': 15,
+        'sheep': 3,
+        'pig': 8,
+        'cow': 2,
+        'horse': 2,
+        'small_dog': 2,
+        'big_dog': 2
+    }
+
+
+@pytest.fixture()
+def common_herd_mock():
+    class CommonHerd:
+        def __init__(self):
+            self.herd = {}
+
+        def add(self, animals):
+            for animal, number in animals.items():
+                self.herd[animal] = self.herd[animal] + number if animal in self.herd.keys() else number
+    return CommonHerd()
