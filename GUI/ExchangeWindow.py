@@ -49,8 +49,30 @@ class ExchangeWindow:
     def exchange_animals(self):
         animals_to_sell = {animal: number.value() for animal, number in self.spin_boxes['sell'].items() if number.value()}
         animals_to_buy = {animal: number.value() for animal, number in self.spin_boxes['buy'].items() if number.value()}
-        self.exchange_callback(self.player_name, animals_to_sell, animals_to_buy)
-        self.dialog.done(0)
+        if self.exchange_possible(animals_to_sell, animals_to_buy):
+            self.exchange_callback(self.player_name, animals_to_sell, animals_to_buy)
+            self.dialog.done(0)
+
+    def exchange_possible(self, animals_to_sell, animals_to_buy):
+        animals_available = self.player_has_enough_animals(animals_to_sell)
+        buy_equals_sell = self.check_if_buy_equals_sell(animals_to_sell, animals_to_buy)
+        return animals_available and buy_equals_sell
+
+    def player_has_enough_animals(self, animals_to_sell):
+        result = True
+        for animal, value in animals_to_sell.items():
+            result = result and (self.available_animals[animal] >= value)
+        return result
+
+    @staticmethod
+    def check_if_buy_equals_sell(animals_to_sell, animals_to_buy):
+        sell = 0
+        buy = 0
+        for animal, value in animals_to_sell.items():
+            sell += PRICE_LIST[animal] * value
+        for animal, value in animals_to_buy.items():
+            buy += PRICE_LIST[animal] * value
+        return sell == buy
 
     def set_exchange_callback(self, callback):
         self.exchange_callback = callback
